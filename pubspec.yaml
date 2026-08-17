@@ -38,6 +38,7 @@ dependencies:
   get: ^4.7.3
   flutter_screenutil: ^5.9.3
   shared_preferences: ^2.5.5
+  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:hesabuapp/data/dtos/auth_dto.dart';
@@ -18,19 +17,12 @@ class AuthRepositoryImpl implements AuthRepository {
   final SharedPreference sharedPreference;
   final UserService userService;
 
-  AuthRepositoryImpl(
-    this.apiClient,
-    this.sharedPreference,
-    this.userService,
-  );
+  AuthRepositoryImpl(this.apiClient, this.sharedPreference, this.userService);
 
   @override
   Future<Auth> login(String email, String password) async {
     try {
-      final request = AuthDto.fromRequest(
-        email: email,
-        password: password,
-      );
+      final request = AuthDto.fromRequest(email: email, password: password);
 
       final response = await apiClient.dio.post(
         ApiEndpoint.login,
@@ -155,7 +147,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Branch> switchBranch(String branchId) async {
+  Future<void> switchBranch(String branchId) async {
     try {
       final response = await apiClient.dio.post(
         ApiEndpoint.branchesSwitch,
@@ -169,24 +161,20 @@ class AuthRepositoryImpl implements AuthRepository {
           throw Exception(data['message'] ?? 'Failed to switch branch');
         }
 
-        final branchData = data['data']?['branch'] ?? data['data'] ?? data;
-        final branch = BranchDto.fromJson(branchData as Map<String, dynamic>).toDomain();
+        final tokens = data['data'];
+        final accessToken = tokens['accessToken'];
+        final refreshToken = tokens['refreshToken'];
 
-        userService.setBranch(
-          branchId: branch.id,
-          branchName: branch.name,
-        );
-
-        sharedPreference.saveBranchId(branch.id);
-        sharedPreference.saveBranchName(branch.name);
-
-        return branch;
+        sharedPreference.saveToken(accessToken);
+        sharedPreference.saveRefreshToken(refreshToken);
       } else {
         throw Exception('Failed to switch branch: ${response.statusCode}');
       }
     } on DioException catch (e) {
       if (e.response?.data != null) {
-        throw Exception(e.response?.data['message'] ?? 'Failed to switch branch');
+        throw Exception(
+          e.response?.data['message'] ?? 'Failed to switch branch',
+        );
       }
       throw Exception('Network error. Check your internet connection.');
     } catch (e) {
@@ -210,7 +198,9 @@ class AuthRepositoryImpl implements AuthRepository {
         }
 
         final businessData = data['data']?['business'] ?? data['data'] ?? data;
-        final business = BusinessDto.fromJson(businessData as Map<String, dynamic>).toDomain();
+        final business = BusinessDto.fromJson(
+          businessData as Map<String, dynamic>,
+        ).toDomain();
 
         if (data['data']?['accessToken'] != null) {
           final newToken = data['data']['accessToken'] as String;
@@ -219,7 +209,9 @@ class AuthRepositoryImpl implements AuthRepository {
         }
 
         if (data['data']?['refreshToken'] != null) {
-          sharedPreference.saveRefreshToken(data['data']['refreshToken'] as String);
+          sharedPreference.saveRefreshToken(
+            data['data']['refreshToken'] as String,
+          );
         }
 
         userService.setBusiness(
@@ -233,7 +225,9 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     } on DioException catch (e) {
       if (e.response?.data != null) {
-        throw Exception(e.response?.data['message'] ?? 'Failed to switch business');
+        throw Exception(
+          e.response?.data['message'] ?? 'Failed to switch business',
+        );
       }
       throw Exception('Network error. Check your internet connection.');
     } catch (e) {

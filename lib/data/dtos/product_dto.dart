@@ -1,8 +1,6 @@
 
 import 'package:hesabuapp/data/dtos/category_dto.dart';
 import 'package:hesabuapp/domain/entities/product.dart';
-import 'package:hesabuapp/domain/entities/category.dart';
-import 'package:hesabuapp/domain/enums/payment_status_enum.dart';
 import 'package:hesabuapp/domain/enums/product_type_enum.dart';
 
 class ProductDto {
@@ -12,7 +10,7 @@ class ProductDto {
   final double? buyingPrice;
   final double? sellingPrice;
   final double? maxPrice;
-  final Map<String, dynamic>? discount;
+  final double discount;
   final String? title;
   final String? description;
   final String? type;
@@ -28,7 +26,7 @@ class ProductDto {
     this.buyingPrice,
     this.sellingPrice,
     this.maxPrice,
-    this.discount,
+    this.discount = 0,
     this.title,
     this.description,
     this.type,
@@ -46,14 +44,11 @@ class ProductDto {
       buyingPrice: _toDouble(json['buyingPrice']),
       sellingPrice: _toDouble(json['sellingPrice']),
       maxPrice: _toDoubleNullable(json['maxPrice']),
-      discount: json['discount'] as Map<String, dynamic>?,
+      discount: _toDoubleNullable(json['discount']) ?? 0.0,
       title: json['title'] as String?,
       description: json['description'] as String?,
       type: json['type'] as String?,
-      isParent: json['isParent'] as bool?,
-      categoryId: json['categoryId'] as String?,
-      quantity: json['quantity'] as Map<String, dynamic>?,
-      category: json['category'] as Map<String, dynamic>?,
+      isParent: json['isParent'] as bool?
     );
   }
 
@@ -65,10 +60,9 @@ class ProductDto {
       if (buyingPrice != null) 'buyingPrice': buyingPrice.toString(),
       if (sellingPrice != null) 'sellingPrice': sellingPrice.toString(),
       if (maxPrice != null) 'maxPrice': maxPrice.toString(),
-      if (discount != null && discount!.isNotEmpty) 'discount': discount,
       if (title != null) 'title': title,
       if (description != null) 'description': description,
-      if (type != null) 'type': type,
+      if (type != null) 'type': type?.toUpperCase(),
       if (categoryId != null) 'categoryId': categoryId,
       if (quantity != null && quantity!.isNotEmpty) 'quantity': quantity,
     };
@@ -101,7 +95,7 @@ class ProductDto {
       buyingPrice: product.buyingPrice,
       sellingPrice: product.sellingPrice,
       maxPrice: product.maxPrice,
-      discount: product.discount != null ? {'value': product.discount} : null,
+      discount: product.discount ?? 0.0,
       title: product.title,
       description: product.description,
       type: product.type.value,

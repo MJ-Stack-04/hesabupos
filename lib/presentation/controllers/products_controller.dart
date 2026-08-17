@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hesabuapp/data/services/user_service.dart';
@@ -69,7 +68,7 @@ class ProductsController extends GetxController {
       }
       products.value = result;
     } catch (e) {
-      error.value = 'Failed to load products. Please try again.';
+      error.value = e.toString();
       Get.snackbar('Error', error.value);
     } finally {
       isLoading.value = false;

@@ -1,5 +1,4 @@
-
-import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:hesabuapp/data/dtos/product_dto.dart';
 import 'package:hesabuapp/data/services/api_client.dart';
 import 'package:hesabuapp/data/services/api_endpoints.dart';
@@ -16,16 +15,16 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<List<Product>> getProducts() async {
     try {
+      debugPrint("Calling me");
       final response = await apiClient.dio.get(ApiEndpoint.products);
-      
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        return data
-            .map((json) => ProductDto.fromJson(json as Map<String, dynamic>).toDomain())
-            .toList();
-      } else {
-        throw Exception('Failed to load products: ${response.statusCode}');
-      }
+      final List<dynamic> data = response.data['data'];
+      debugPrint("Mydata: $data");
+      return data
+          .map(
+            (json) =>
+                ProductDto.fromJson(json as Map<String, dynamic>).toDomain(),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Failed to load products: $e');
     }
@@ -34,10 +33,14 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Product> getProductById(String id) async {
     try {
-      final response = await apiClient.dio.get('${ApiEndpoint.products}/id/$id');
-      
+      final response = await apiClient.dio.get(
+        '${ApiEndpoint.products}/id/$id',
+      );
+
       if (response.statusCode == 200) {
-        return ProductDto.fromJson(response.data as Map<String, dynamic>).toDomain();
+        return ProductDto.fromJson(
+          response.data as Map<String, dynamic>,
+        ).toDomain();
       } else {
         throw Exception('Failed to load product: ${response.statusCode}');
       }
@@ -49,12 +52,18 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Product> getProductBySku(String sku) async {
     try {
-      final response = await apiClient.dio.get('${ApiEndpoint.products}/sku/$sku');
-      
+      final response = await apiClient.dio.get(
+        '${ApiEndpoint.products}/sku/$sku',
+      );
+
       if (response.statusCode == 200) {
-        return ProductDto.fromJson(response.data as Map<String, dynamic>).toDomain();
+        return ProductDto.fromJson(
+          response.data as Map<String, dynamic>,
+        ).toDomain();
       } else {
-        throw Exception('Failed to load product by SKU: ${response.statusCode}');
+        throw Exception(
+          'Failed to load product by SKU: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Failed to load product by SKU: $e');
@@ -68,11 +77,14 @@ class ProductRepositoryImpl implements ProductRepository {
         ApiEndpoint.productsSearch,
         queryParameters: {'query': query},
       );
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data
-            .map((json) => ProductDto.fromJson(json as Map<String, dynamic>).toDomain())
+            .map(
+              (json) =>
+                  ProductDto.fromJson(json as Map<String, dynamic>).toDomain(),
+            )
             .toList();
       } else {
         throw Exception('Failed to search products: ${response.statusCode}');
@@ -85,15 +97,22 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<List<Product>> getProductsByType(String type) async {
     try {
-      final response = await apiClient.dio.get('${ApiEndpoint.products}/type/$type');
-      
+      final response = await apiClient.dio.get(
+        '${ApiEndpoint.products}/type/$type',
+      );
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data
-            .map((json) => ProductDto.fromJson(json as Map<String, dynamic>).toDomain())
+            .map(
+              (json) =>
+                  ProductDto.fromJson(json as Map<String, dynamic>).toDomain(),
+            )
             .toList();
       } else {
-        throw Exception('Failed to load products by type: ${response.statusCode}');
+        throw Exception(
+          'Failed to load products by type: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Failed to load products by type: $e');
@@ -103,15 +122,22 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<List<Product>> getProductVariants(String productId) async {
     try {
-      final response = await apiClient.dio.get('${ApiEndpoint.products}/$productId/variants');
-      
+      final response = await apiClient.dio.get(
+        '${ApiEndpoint.products}/$productId/variants',
+      );
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data
-            .map((json) => ProductDto.fromJson(json as Map<String, dynamic>).toDomain())
+            .map(
+              (json) =>
+                  ProductDto.fromJson(json as Map<String, dynamic>).toDomain(),
+            )
             .toList();
       } else {
-        throw Exception('Failed to load product variants: ${response.statusCode}');
+        throw Exception(
+          'Failed to load product variants: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Failed to load product variants: $e');
@@ -122,14 +148,16 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Product> createProduct(Product product) async {
     try {
       final dto = ProductDto.fromDomain(product);
-      
+
       final response = await apiClient.dio.post(
         ApiEndpoint.products,
         data: dto.toJson(),
       );
-      
+
       if (response.statusCode == 201) {
-        return ProductDto.fromJson(response.data as Map<String, dynamic>).toDomain();
+        return ProductDto.fromJson(
+          response.data as Map<String, dynamic>,
+        ).toDomain();
       } else {
         throw Exception('Failed to create product: ${response.statusCode}');
       }
@@ -142,14 +170,16 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Product> updateProduct(String id, Product product) async {
     try {
       final dto = ProductDto.fromDomain(product);
-      
+
       final response = await apiClient.dio.put(
         '${ApiEndpoint.products}/$id',
         data: dto.toJson(),
       );
-      
+
       if (response.statusCode == 200) {
-        return ProductDto.fromJson(response.data as Map<String, dynamic>).toDomain();
+        return ProductDto.fromJson(
+          response.data as Map<String, dynamic>,
+        ).toDomain();
       } else {
         throw Exception('Failed to update product: ${response.statusCode}');
       }
@@ -161,8 +191,10 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<void> deleteProduct(String id) async {
     try {
-      final response = await apiClient.dio.delete('${ApiEndpoint.products}/$id');
-      
+      final response = await apiClient.dio.delete(
+        '${ApiEndpoint.products}/$id',
+      );
+
       if (response.statusCode != 204) {
         throw Exception('Failed to delete product: ${response.statusCode}');
       }
